@@ -32,9 +32,9 @@ function Router(io) {
         const pollsCollection = await getCollection("Polls");
         pollsCollection.insertOne(newPoll);
 
-        io.emit("newPoll");
-
         res.send({message: "Sucessfully added poll to collection"})
+        const pollArr = await pollsCollection.find({}).toArray();
+        io.emit("newPoll", pollArr);
     })
     //Post a vote to certain poll 
     router.post("/:id", async (req, res) => {
