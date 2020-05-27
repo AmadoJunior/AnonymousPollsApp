@@ -3,13 +3,16 @@ const app = require("express")();
 const http = require("http");
 const socketio = require("socket.io");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
+require("dotenv").config();
 
 //CORS
 app.use(cors());
 
 //Middleware
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 //Setting up IO
 const server = http.Server(app);
@@ -32,6 +35,7 @@ app.use("/api/poll", poll);
 if(process.env.NODE_ENV === "production"){
     app.use(express.static(__dirname + "/public/"));
     app.get(/.*/, (req, res) => {
+
         res.sendFile(__dirname + "/public/index.html");
     })
 }

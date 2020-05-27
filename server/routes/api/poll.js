@@ -21,9 +21,15 @@ function Router(io) {
     //Router Methods
     //Get entire data base as array of objects
     router.get("/", async (req, res) => {
-        console.log("GET");
-        const pollsCollection = await getCollection("Polls");
-        res.send(await pollsCollection.find({}).toArray());
+        try{
+            const pollsCollection = await getCollection("Polls");
+            const pollArray = await pollsCollection.find({}).toArray();
+            res.send(pollArray);
+            io.emit("pollListSent", req.cookies.marked);
+        } catch(err) {
+            console.log("Mongo Error: " + err);
+        }
+        
     })
     //Post a new poll
     router.post("/", async (req, res) => {
@@ -31,7 +37,7 @@ function Router(io) {
         const newPoll = new Poll(req.body.title, req.body.options)
         const pollsCollection = await getCollection("Polls");
         pollsCollection.insertOne(newPoll);
-
+        
         res.send({message: "Sucessfully added poll to collection"})
         const pollArr = await pollsCollection.find({}).toArray();
         io.emit("newPoll", pollArr);
@@ -48,6 +54,18 @@ function Router(io) {
                 {$inc: {'options.$[element].votes': 1}},
                 {arrayFilters: [ {"element.title": optionTitle}]}
             )
+            
+            //Marked Poll Cookies
+            const cookies = req.cookies;
+            let farFuture = new Date(new Date().getTime() + (1000*60*60*24*365*10));
+            if(cookies.marked !== undefined){
+                const tempArr = JSON.parse(cookies.marked);
+                tempArr.push(ID);
+                res.cookie("marked", JSON.stringify(tempArr), {expires: farFuture, httpOnly: true});
+            } else {
+                res.cookie("marked", JSON.stringify([ID]), {expires: farFuture, httpOnly: true});
+            }
+
             res.send({message: "Updated"})
             const pollArray = await pollsCollection.find({}).toArray();
             io.emit("voteCasted", pollArray)
