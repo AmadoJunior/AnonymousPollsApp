@@ -1,5 +1,6 @@
 //Dependencies
-const app = require("express")();
+const express = require("express");
+const app = express();
 const http = require("http");
 const socketio = require("socket.io");
 const bodyParser = require("body-parser");
