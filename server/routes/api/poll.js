@@ -58,12 +58,22 @@ function Router(io) {
             //Marked Poll Cookies
             const cookies = req.cookies;
             let farFuture = new Date(new Date().getTime() + (1000*60*60*24*365*10));
+            let dup = false;
             if(cookies.marked !== undefined){
                 const tempArr = JSON.parse(cookies.marked);
-                tempArr.push(ID);
-                res.cookie("marked", JSON.stringify(tempArr), {expires: farFuture, httpOnly: true});
+                for(let id of tempArr){
+                    if(id === ID){
+                        dup = true;
+                        break;
+                    }
+                }
+                if(!dup){
+                    tempArr.push(ID);
+                    res.cookie("marked", JSON.stringify(tempArr), {expires: farFuture, httpOnly: true, secure: true});
+                }
+                
             } else {
-                res.cookie("marked", JSON.stringify([ID]), {expires: farFuture, httpOnly: true});
+                res.cookie("marked", JSON.stringify([ID]), {expires: farFuture, httpOnly: true, secure: true});
             }
 
             res.send({message: "Updated"})
