@@ -9,7 +9,7 @@ const router = express.Router();
 const Poll = require("./../../models/Poll");
 
 //DB Connection
-const URL = "mongodb+srv://AmadoJunior:Amaditin4000041776@cluster0-s3lnp.mongodb.net/test?retryWrites=true&w=majority";
+const URL = "mongodb+srv://AmadoJunior:"+ process.env.MONGO_DB_PASS+"@cluster0-s3lnp.mongodb.net/test?retryWrites=true&w=majority";
 
 //DB Getter
 const getCollection = async (collectionName) => {
