@@ -6,7 +6,7 @@ const socketio = require("socket.io");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-require("dotenv").config();
+require("dotenv").config({path: "./../.env"});
 
 //CORS
 app.use(cors());

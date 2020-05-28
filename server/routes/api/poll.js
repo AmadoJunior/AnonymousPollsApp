@@ -39,7 +39,8 @@ function Router(io) {
         pollsCollection.insertOne(newPoll);
         
         res.send({message: "Sucessfully added poll to collection"})
-        const pollArr = await pollsCollection.find({}).toArray();
+        const newCollection = await getCollection("Polls");
+        const pollArr = await newCollection.find({}).toArray()
         io.emit("newPoll", pollArr);
     })
     //Post a vote to certain poll 
@@ -79,12 +80,23 @@ function Router(io) {
             res.send({message: "Updated"})
             const pollArray = await pollsCollection.find({}).toArray();
             io.emit("voteCasted", pollArray)
-            console.log("votedCasted")
         } catch(err){
             console.log(err);
         }
         
     })
+
+    router.delete("/rm/:id", async (req, res) => {
+        const pollsCollection  = await getCollection("Polls");
+        const ID = new mongoDb.ObjectID(req.params.id);
+        pollsCollection.deleteOne({_id: ID})    
+        res.send({
+            message: "Poll deleted"
+        })
+        const pollArray = await pollsCollection.find({}).toArray();
+        io.emit("pollRemoved", pollArray);
+    })
+
     return router;
 }
 
